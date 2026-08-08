@@ -1,0 +1,39 @@
+.progress-bar {
+    position: relative;
+    margin-block: 0 1rem;
+    margin-inline: 0.5rem;
+    border-radius: calc(infinity * 1px);
+    overflow: hidden;
+    background-color: rgb(55 65 81);
+}
+
+.progress {
+    height: 2.5rem;
+    transition: width 1000ms linear;
+    background-color: rgb(191 219 254);
+}
+
+#timer-time {
+    position: absolute;
+    left: 0;
+    inset-block: 0;
+    z-index: 10;
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+    display: flex;
+    align-items: center;
+    color: rgb(0 0 0 / 0.7);
+    padding-left: 1.25rem;
+}
+.clock-icon {
+    position: absolute;
+    right: 0;
+    inset-block: 0;
+    z-index: 10;
+    font-size: 1.5rem;
+    line-height: 2rem;
+    display: flex;
+    align-items: center;
+    color: rgb(0 0 0 / 0.7);
+    padding-left: 0.75rem;
+}
