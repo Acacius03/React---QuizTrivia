@@ -1,9 +1,5 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    border: none;
-}
+@import "tailwindcss";
+
 body {
     height: 100dvh;
     background-color: #111827;
@@ -129,65 +125,7 @@ main > header {
 #side-nav-toggle:hover {
     background-color: #374151;
 }
-h1 {
-    font-size: 1.875rem;
-    line-height: 2.25rem;
-    font-weight: bold;
-    color: #a855f7;
-}
-h1 > span {
-    color: #eab308;
-}
-main > section {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    padding-inline: 20px;
-}
-main > footer {
-    height: 128px;
-}
-/* sm */
-@media screen and (min-width: 600px) {
-    #side-nav > h3 {
-        font-size: 2.25rem;
-        line-height: 2.5rem;
-    }
-    #side-nav > div > button {
-        font-size: 1rem;
-        line-height: 1.5rem;
-    }
-    main > header {
-        padding: 40px 32px;
-    }
-    #side-nav-toggle > * {
-        width: 48px;
-        height: 48px;
-    }
-    main > header > h1 {
-        font-size: 3.75rem;
-        line-height: 1;
-    }
-    main > section {
-        padding-inline: 40px;
-    }
-}
-/* xl */
-@media screen and (min-width: 1280px) {
-    #side-nav {
-        translate: 0 0;
-        position: relative;
-    }
-    #side-nav-close-btn {
-        display: none;
-    }
-    #side-nav-toggle {
-        display: none;
-    }
-    main > header > h1 {
-        margin-inline: auto;
-    }
-}
+
 .click-ripple-effect {
     position: fixed;
     z-index: 1000;

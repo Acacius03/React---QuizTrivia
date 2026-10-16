@@ -8,6 +8,7 @@ import {
   QUIZ_TYPE,
   type QuizData,
 } from "./api";
+import { Menu } from "lucide-react";
 
 function App() {
   const [quizzes, setQuizzes] = useState<QuizData[]>([]);
@@ -30,9 +31,9 @@ function App() {
   const [quizTypeIndex] = useState(0);
 
   const onClickEffect = (e: PointerEvent) => {
-    let x = e.pageX;
-    let y = e.pageY;
-    let span = document.createElement("span");
+    const x = e.pageX;
+    const y = e.pageY;
+    const span = document.createElement("span");
     span.classList.add("click-ripple-effect");
     span.style.top = y + "px";
     span.style.left = x + "px";
@@ -60,9 +61,16 @@ function App() {
 
   return (
     <>
-      <h1>
-        Trivial <span>XD</span>
-      </h1>
+      <div className="flex items-center justify-between px-5 py-4">
+        <h1 className="text-4xl font-bold">
+          <span className="text-purple-500">Trivial</span>{" "}
+          <span className="text-amber-300">XD</span>
+        </h1>
+
+        <button className="h-12 w-12 content-center rounded-xl bg-blue-950">
+          <Menu className="m-auto" />
+        </button>
+      </div>
       <Timer
         initialTime={15}
         isRunning={true}
@@ -72,10 +80,9 @@ function App() {
         }}
       />
       <div className="flex justify-between p-2 text-2xl">
-        <span>
-          Question
-          <span id="quiz-number">{quizNumber + 1}</span>
-        </span>
+        <p>
+          Question <span id="quiz-number">{quizNumber + 1}</span>
+        </p>
         <span>
           <span id="success" className="text-green-400">
             {correctCount}
