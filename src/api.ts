@@ -49,14 +49,27 @@ export interface QuizData {
 	incorrect_answers: string[];
 }
 
-function mapper(data: any): QuizData {
+function isString(value: unknown): value is string {
+  return typeof value === "string";
+}
+
+function parseString(value: unknown): string {
+  return isString(value) ? value : "";
+}
+
+function parseStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.map(item => parseString(item));
+}
+
+function mapper(data: Record<string, unknown>): QuizData {
 	return {
-		type: data.type || "",
-		difficulty: data.difficulty || "",
-		category: data.category || "",
-		question: data.question || "",
-		correct_answer: data.correct_answer || "",
-		incorrect_answers: data.incorrect_answers || [],
+		type: parseString(data.type),
+		difficulty: parseString(data.difficulty) ,
+		category: parseString(data.category),
+		question: parseString(data.question),
+		correct_answer: parseString(data.correct_answer),
+		incorrect_answers: parseStringArray(data.incorrect_answers),
 	};
 }
 
@@ -68,8 +81,7 @@ export async function getQuizzes(urlParam: {
   const cache = localStorage.getItem("cache");
   if (cache) {
     const parsed = JSON.parse(cache);
-   	if (parsed && Array.isArray(parsed)) return parsed.map(mapper);
-    return [];
+   	return parsed.map(mapper);
   }
 
 	const result = await fetch(
