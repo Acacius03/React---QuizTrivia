@@ -1,53 +1,55 @@
+import { useState } from "react";
 import type { QuizData } from "../api";
+import CorrectIncorrectCounter from "./CorrectIncorrectCounter";
+import QuizItem from "./QuizItem";
+import QuizNumber from "./QuizNumber";
+import Timer from "./Timer";
 
 interface Props {
-  quiz: QuizData;
-  onCorrectAnswer: () => void;
-  onIncorrectAnswer: () => void;
+  className?: string;
+  quizzes: QuizData[];
 }
+export default function Quiz({ quizzes }: Props) {
+  const [quizNumber, setQuizNumber] = useState(0);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [incorrectCount, setIncorrectCount] = useState(0);
 
-function Quiz({ quiz, onCorrectAnswer, onIncorrectAnswer }: Props) {
-  const handleAnswer = (answer: string) => {
-    if (answer === quiz.correct_answer) {
-      onCorrectAnswer();
-    } else {
-      onIncorrectAnswer();
-    }
+  const success = () => {
+    setQuizNumber((prev) => prev + 1);
+    setCorrectCount((prev) => prev + 1);
   };
-
-  const shuffleArray = (array: string[]): string[] => {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-
-    return array;
+  const fail = () => {
+    setQuizNumber((prev) => prev + 1);
+    setIncorrectCount((prev) => prev + 1);
   };
 
   return (
-    <div className="p-8 flex-grow bg-blue-800 rounded-xl" id="quiz">
-      <h2 id="quiz-question" className="text-2xl font-bold text-center">
-        {quiz.question}
-      </h2>
-      <ul id="quiz-options" className="space-y-3 p-2 mt-4">
-        {shuffleArray([quiz.correct_answer, ...quiz.incorrect_answers]).map(
-          (option, index) => (
-            <li
-              key={index}
-              className="bg-blue-950 text-neutral-300 text-xl rounded-lg overflow-hidden"
-            >
-              <button
-                className="options block w-full h-full p-2"
-                onClick={() => handleAnswer(option)}
-              >
-                {option}
-              </button>
-            </li>
-          ),
+    <div>
+      <Timer
+        key={quizNumber}
+        initialTime={15}
+        isRunning={Boolean(quizzes[quizNumber])}
+        onComplete={fail}
+      />
+
+      <div className="flex justify-between p-2 text-2xl">
+        <QuizNumber quizNumber={quizNumber + 1} />
+        <CorrectIncorrectCounter
+          correctCount={correctCount}
+          incorrectCount={incorrectCount}
+        />
+      </div>
+      <div className="mt-2 px-4">
+        {quizzes[quizNumber] ? (
+          <QuizItem
+            quiz={quizzes[quizNumber]}
+            onCorrectAnswer={success}
+            onIncorrectAnswer={fail}
+          />
+        ) : (
+          <div>No Quiz</div>
         )}
-      </ul>
+      </div>
     </div>
   );
 }
-
-export default Quiz;

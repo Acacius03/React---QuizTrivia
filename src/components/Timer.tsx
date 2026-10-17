@@ -10,6 +10,12 @@ type Props = {
 function Timer({ initialTime, isRunning, onComplete }: Props) {
   const [timeLeft, setTimeLeft] = useState(initialTime);
   const intervalRef = useRef<number | null>(null);
+  const completedRef = useRef(false);
+  const onCompleteRef = useRef(onComplete);
+
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   const pause = () => {
     if (intervalRef.current === null) return;
@@ -18,29 +24,35 @@ function Timer({ initialTime, isRunning, onComplete }: Props) {
   };
 
   const countDown = () => {
-    setTimeLeft((prev) => {
-      if (prev > 1) return prev - 1;
-      pause();
-      onComplete();
-      return 0;
-    });
-  };
-
-  const start = () => {
-    if (intervalRef.current !== null) return;
-    intervalRef.current = window.setInterval(countDown, 1000);
+    setTimeLeft((prev) => Math.max(0, prev - 1));
   };
 
   useEffect(() => {
-    if (isRunning) start();
-    else pause();
+    if (!isRunning || timeLeft <= 0) {
+      pause();
+
+      if (isRunning && timeLeft <= 0 && !completedRef.current) {
+        completedRef.current = true;
+        onCompleteRef.current();
+      }
+
+      return pause;
+    }
+
+    start();
+
+    function start() {
+      if (intervalRef.current !== null) return;
+      intervalRef.current = window.setInterval(countDown, 1000);
+    }
 
     return pause;
-  }, [isRunning]);
+  }, [isRunning, timeLeft]);
 
-  useEffect(() => {
-    setTimeLeft(initialTime);
-  }, [initialTime]);
+  // useEffect(() => {
+  //   setTimeLeft(initialTime);
+  //   completedRef.current = false;
+  // }, [initialTime]);
 
   return (
     <div className="progress-bar">

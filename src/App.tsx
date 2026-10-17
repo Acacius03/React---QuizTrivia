@@ -1,6 +1,4 @@
-import { useEffect, useState } from "react";
-import Quiz from "./components/Quiz.tsx";
-import Timer from "./components/Timer";
+import { useCallback, useEffect, useState } from "react";
 import {
   getQuizzes,
   QUIZ_CATEGORY,
@@ -8,27 +6,14 @@ import {
   QUIZ_TYPE,
   type QuizData,
 } from "./api";
-import { Menu } from "lucide-react";
+import Header from "./components/Header.tsx";
+import Quiz from "./components/Quiz.tsx";
+import Sidebar from "./components/Sidebar.tsx";
 
 function App() {
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+
   const [quizzes, setQuizzes] = useState<QuizData[]>([]);
-
-  const success = () => {
-    setQuizNumber((prev) => prev + 1);
-    setCorrectCount((prev) => prev + 1);
-  };
-  const fail = () => {
-    setQuizNumber((prev) => prev + 1);
-    setIncorrectCount((prev) => prev + 1);
-  };
-
-  const [quizNumber, setQuizNumber] = useState(0);
-  const [correctCount, setCorrectCount] = useState(0);
-  const [incorrectCount, setIncorrectCount] = useState(0);
-
-  const [quizCategoryIndex] = useState(0);
-  const [quizDifficultyIndex] = useState(0);
-  const [quizTypeIndex] = useState(0);
 
   const onClickEffect = (e: PointerEvent) => {
     const x = e.pageX;
@@ -42,71 +27,38 @@ function App() {
     setTimeout(() => span.remove(), 600);
   };
 
-  useEffect(() => {
-    getQuizzes({
-      category: QUIZ_CATEGORY[quizCategoryIndex].urlParam,
-      difficulty: QUIZ_DIFFICULTY[quizDifficultyIndex].urlParam,
-      type: QUIZ_TYPE[quizTypeIndex].urlParam,
-    }).then((res) => {
-      if (res.length) {
-        setQuizzes(res);
-      }
-    });
+  const fetchQuizzes = useCallback(
+    (categoryIndex: number, difficultyIndex: number, typeIndex: number) => {
+      getQuizzes({
+        category: QUIZ_CATEGORY[categoryIndex].urlParam,
+        difficulty: QUIZ_DIFFICULTY[difficultyIndex].urlParam,
+        type: QUIZ_TYPE[typeIndex].urlParam,
+      }).then((res) => {
+        if (res.length) setQuizzes(res);
+      });
+    },
+    [],
+  );
 
+  useEffect(() => {
+    fetchQuizzes(0, 0, 0);
     document.body.addEventListener("click", onClickEffect);
     return () => {
       document.body.removeEventListener("click", onClickEffect);
     };
-  }, []);
+  }, [fetchQuizzes]);
 
   return (
     <>
-      <div className="flex items-center justify-between px-5 py-4">
-        <h1 className="text-4xl font-bold">
-          <span className="text-purple-500">Trivial</span>{" "}
-          <span className="text-amber-300">XD</span>
-        </h1>
-
-        <button className="h-12 w-12 content-center rounded-xl bg-blue-950">
-          <Menu className="m-auto" />
-        </button>
-      </div>
-      <Timer
-        initialTime={15}
-        isRunning={true}
-        onComplete={() => {
-          console.log("finish");
-          fail();
-        }}
-      />
-      <div className="flex justify-between p-2 text-2xl">
-        <p>
-          Question <span id="quiz-number">{quizNumber + 1}</span>
-        </p>
-        <span>
-          <span id="success" className="text-green-400">
-            {correctCount}
-          </span>
-          /
-          <span id="fail" className="text-red-400">
-            {incorrectCount}
-          </span>
-        </span>
-      </div>
-      {quizzes[quizNumber] ? (
-        <Quiz
-          quiz={quizzes[quizNumber]}
-          onCorrectAnswer={() => {
-            console.log("Correct!!");
-            success();
+      <Header onToggleMenu={() => setIsSidebarExpanded((value) => !value)} />
+      <Quiz quizzes={quizzes} />
+      {isSidebarExpanded && (
+        <Sidebar
+          onApplyFilters={({ categoryIndex, difficultyIndex, typeIndex }) => {
+            fetchQuizzes(categoryIndex, difficultyIndex, typeIndex);
           }}
-          onIncorrectAnswer={() => {
-            console.log("Incorrect!!");
-            fail();
-          }}
+          onClose={() => setIsSidebarExpanded(false)}
         />
-      ) : (
-        <div>No Quiz</div>
       )}
     </>
   );

@@ -78,21 +78,20 @@ export async function getQuizzes(urlParam: {
 	difficulty: string;
 	type: string;
 }): Promise<QuizData[]> {
-  const cache = localStorage.getItem("cache");
+  const url = `https://opentdb.com/api.php?amount=30${urlParam.category}${urlParam.difficulty}${urlParam.type}`
+  const cache = localStorage.getItem(`cache-${url}`);
   if (cache) {
     const parsed = JSON.parse(cache);
    	return parsed.map(mapper);
   }
 
-	const result = await fetch(
-		`https://opentdb.com/api.php?amount=30${urlParam.category}${urlParam.difficulty}${urlParam.type}`,
-	);
+	const result = await fetch(url);
 
 	if (!result.ok) return [];
 	const json = await result.json();
 
 	const results = json.results;
-	localStorage.setItem("cache", JSON.stringify(results))
+	localStorage.setItem(`cache-${url}`, JSON.stringify(results))
 	if (results && Array.isArray(results)) return results.map(mapper);
 
 	return [];
