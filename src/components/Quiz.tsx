@@ -13,27 +13,35 @@ export default function Quiz({ quizzes }: Props) {
   const [quizNumber, setQuizNumber] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
   const [incorrectCount, setIncorrectCount] = useState(0);
-
-  const success = () => {
-    setQuizNumber((prev) => prev + 1);
-    setCorrectCount((prev) => prev + 1);
-  };
-  const fail = () => {
-    setQuizNumber((prev) => prev + 1);
-    setIncorrectCount((prev) => prev + 1);
-  };
+  const [isPaused, setIsPaused] = useState(false);
+  function success() {
+    setIsPaused(true);
+    setTimeout(() => {
+      setIsPaused(false);
+      setQuizNumber((prev) => prev + 1);
+      setCorrectCount((prev) => prev + 1);
+    }, 1000);
+  }
+  function fail() {
+    setIsPaused(true);
+    setTimeout(() => {
+      setIsPaused(false);
+      setQuizNumber((prev) => prev + 1);
+      setIncorrectCount((prev) => prev + 1);
+    }, 1000);
+  }
 
   return (
     <div>
       <Timer
         key={quizNumber}
         initialTime={15}
-        isRunning={Boolean(quizzes[quizNumber])}
+        isRunning={!isPaused && Boolean(quizzes[quizNumber])}
         onComplete={fail}
       />
 
       <div className="flex justify-between p-2 text-2xl">
-        <QuizNumber quizNumber={quizNumber + 1} />
+        <QuizNumber quizNumber={quizNumber} />
         <CorrectIncorrectCounter
           correctCount={correctCount}
           incorrectCount={incorrectCount}
@@ -42,6 +50,7 @@ export default function Quiz({ quizzes }: Props) {
       <div className="mt-2 px-4">
         {quizzes[quizNumber] ? (
           <QuizItem
+            key={quizNumber}
             quiz={quizzes[quizNumber]}
             onCorrectAnswer={success}
             onIncorrectAnswer={fail}

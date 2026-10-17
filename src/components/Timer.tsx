@@ -49,11 +49,6 @@ function Timer({ initialTime, isRunning, onComplete }: Props) {
     return pause;
   }, [isRunning, timeLeft]);
 
-  // useEffect(() => {
-  //   setTimeLeft(initialTime);
-  //   completedRef.current = false;
-  // }, [initialTime]);
-
   return (
     <div className="progress-bar">
       <span id="timer-time">
