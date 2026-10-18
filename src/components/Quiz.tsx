@@ -14,28 +14,27 @@ export default function Quiz({ quizzes }: Props) {
   const [correctCount, setCorrectCount] = useState(0);
   const [incorrectCount, setIncorrectCount] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  function success() {
+  function handleAnswer(answer: string | null = null) {
     setIsPaused(true);
+    if (quizzes[quizNumber].correct_answer === answer) {
+      setCorrectCount((prev) => prev + 1);
+    } else {
+      setIncorrectCount((prev) => prev + 1);
+    }
     setTimeout(() => {
       setIsPaused(false);
       setQuizNumber((prev) => prev + 1);
-      setCorrectCount((prev) => prev + 1);
     }, 1000);
   }
   function fail() {
-    setIsPaused(true);
-    setTimeout(() => {
-      setIsPaused(false);
-      setQuizNumber((prev) => prev + 1);
-      setIncorrectCount((prev) => prev + 1);
-    }, 1000);
+    handleAnswer();
   }
 
   return (
-    <div>
+    <div className="px-4">
       <Timer
         key={quizNumber}
-        initialTime={15}
+        initialTimeMs={15000}
         isRunning={!isPaused && Boolean(quizzes[quizNumber])}
         onComplete={fail}
       />
@@ -47,13 +46,12 @@ export default function Quiz({ quizzes }: Props) {
           incorrectCount={incorrectCount}
         />
       </div>
-      <div className="mt-2 px-4">
+      <div className="mt-2 rounded-xl bg-blue-800 p-8">
         {quizzes[quizNumber] ? (
           <QuizItem
             key={quizNumber}
             quiz={quizzes[quizNumber]}
-            onCorrectAnswer={success}
-            onIncorrectAnswer={fail}
+            onAnswer={handleAnswer}
           />
         ) : (
           <div>No Quiz</div>

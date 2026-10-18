@@ -1,28 +1,19 @@
 @import "tailwindcss";
 
-html, body {
-    height: 100dvh;
-    overflow: hidden;
+html,
+body {
+  height: 100dvh;
+  overflow: hidden;
 }
 
 body {
-    background-color: #111827;
-    color: #e5e5e5;
-
-    position: relative;
-}
-body::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background-image: url("/confetti.png");
-    background-size: cover;
-
-    transform: rotate(180deg);
+  background-color: #111827;
+  color: #e5e5e5;
+  user-select: none;
+  position: relative;
 }
 
 #root {
-    height: 100%;
-    position: relative;
+  height: 100%;
+  position: relative;
 }

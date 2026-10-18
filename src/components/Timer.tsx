@@ -1,73 +1,83 @@
+import { Clock } from "lucide-react";
 import "./Timer.css";
 import { useEffect, useRef, useState } from "react";
 
 type Props = {
-  initialTime: number;
+  initialTimeMs: number;
   isRunning: boolean;
   onComplete: () => void;
 };
 
-function Timer({ initialTime, isRunning, onComplete }: Props) {
-  const [timeLeft, setTimeLeft] = useState(initialTime);
-  const intervalRef = useRef<number | null>(null);
-  const completedRef = useRef(false);
+function Timer({ initialTimeMs, isRunning, onComplete }: Props) {
+  const [timeLeft, setTimeLeft] = useState(initialTimeMs);
+  const [progress, setProgress] = useState(100);
+
   const onCompleteRef = useRef(onComplete);
+  const completedRef = useRef(false);
+  const remainingRef = useRef(initialTimeMs);
+
+  // useEffect(() => {
+  //   onCompleteRef.current = onComplete;
+  // }, [onComplete]);
 
   useEffect(() => {
-    onCompleteRef.current = onComplete;
-  }, [onComplete]);
+    if (!isRunning) return;
 
-  const pause = () => {
-    if (intervalRef.current === null) return;
-    clearInterval(intervalRef.current);
-    intervalRef.current = null;
-  };
+    let frameId = 0;
+    let lastDisplayedSecond = Math.ceil(remainingRef.current / 1000);
+    const endTime = performance.now() + remainingRef.current;
 
-  const countDown = () => {
-    setTimeLeft((prev) => Math.max(0, prev - 1));
-  };
+    function animate(now: number) {
+      const remaining = Math.max(0, endTime - now);
 
-  useEffect(() => {
-    if (!isRunning || timeLeft <= 0) {
-      pause();
+      remainingRef.current = remaining;
 
-      if (isRunning && timeLeft <= 0 && !completedRef.current) {
-        completedRef.current = true;
-        onCompleteRef.current();
+      setProgress(initialTimeMs > 0 ? (remaining / initialTimeMs) * 100 : 0);
+
+      const displayedSecond = Math.ceil(remaining / 1000);
+
+      if (displayedSecond !== lastDisplayedSecond) {
+        lastDisplayedSecond = displayedSecond;
+        setTimeLeft(remaining);
       }
 
-      return pause;
+      if (remaining <= 0) {
+        completedRef.current = true;
+        setTimeLeft(0);
+        setProgress(0);
+        onCompleteRef.current();
+        return;
+      }
+
+      frameId = requestAnimationFrame(animate);
     }
 
-    start();
+    frameId = requestAnimationFrame(animate);
 
-    function start() {
-      if (intervalRef.current !== null) return;
-      intervalRef.current = window.setInterval(countDown, 1000);
-    }
+    return () => {
+      cancelAnimationFrame(frameId);
+      remainingRef.current = Math.max(0, endTime - performance.now());
+    };
+  }, [isRunning, initialTimeMs]);
 
-    return pause;
-  }, [isRunning, timeLeft]);
+  const seconds = Math.ceil(timeLeft / 1000);
 
   return (
-    <div className="progress-bar">
-      <span id="timer-time">
-        00:
-        <span id="timer-time-seconds">
-          {timeLeft.toString().padStart(2, "0")}
-        </span>
-      </span>
+    <div className="relative flex h-12 w-full items-center overflow-hidden rounded-full bg-amber-400">
       <div
-        id="timer"
-        className="progress"
-        style={{
-          width: `${(timeLeft / initialTime) * 100}%`,
-        }}
-      ></div>
-      <span className="clock-icon">
-        <i className="fa-regular fa-clock"></i>
+        className="timer-progress h-full bg-blue-500"
+        style={{ width: `${progress}%` }}
+      />
+
+      <span className="absolute left-4 z-10 tabular-nums">
+        00:{seconds.toString().padStart(2, "0")}
+      </span>
+
+      <span className="absolute right-4 z-10">
+        <Clock />
       </span>
     </div>
   );
 }
+
 export default Timer;
