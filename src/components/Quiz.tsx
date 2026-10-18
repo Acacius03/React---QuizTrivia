@@ -9,6 +9,7 @@ interface Props {
   className?: string;
   quizzes: QuizData[];
 }
+
 export default function Quiz({ quizzes }: Props) {
   const [quizNumber, setQuizNumber] = useState(0);
   const [correctCount, setCorrectCount] = useState(0);
@@ -54,7 +55,7 @@ export default function Quiz({ quizzes }: Props) {
             onAnswer={handleAnswer}
           />
         ) : (
-          <div>No Quiz</div>
+          <div>No More Quiz</div>
         )}
       </div>
     </div>
